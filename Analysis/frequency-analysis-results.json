@@ -1,0 +1,32 @@
+{
+  "frequency_analysis": {
+    "passed": false,
+    "chi_square": 317072.63292720244,
+    "p_value": 0.0,
+    "unique_symbols": 20
+  },
+  "entropy_analysis": {
+    "passed": true,
+    "shannon_entropy": 13.189606514545511,
+    "max_entropy": 13.215987941161384,
+    "normalized_entropy": 0.9980038248571863
+  },
+  "avalanche_effect": {
+    "passed": true,
+    "average_change_ratio": 0.7760708008849676,
+    "std_dev": 0.1569309215273223
+  },
+  "malleability_resistance": {
+    "passed": true,
+    "detection_rate": 1.0
+  },
+  "known_plaintext": {
+    "passed": true,
+    "attacker_success": false
+  },
+  "collision_resistance": {
+    "passed": true,
+    "collision_rate": 0.0,
+    "collisions": 0
+  }
+}

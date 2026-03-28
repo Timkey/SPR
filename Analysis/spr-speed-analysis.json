@@ -1,0 +1,113 @@
+{
+  "spr_speed": {
+    "claim": "Fast encoding/decoding operations",
+    "encode_ops_per_sec": 150018.33944196388,
+    "decode_ops_per_sec": 191196.93664565397,
+    "status": "MEASURED"
+  },
+  "vs_aes": {
+    "claim": "Faster than AES (20x-50x)",
+    "aes_ops_per_sec": 1909288.9197360575,
+    "spr_ops_per_sec": 435394.5273081466,
+    "speedup": 0.22804014772595865,
+    "claimed_min": 20,
+    "claimed_max": 50,
+    "status": "REFUTED",
+    "verdict": "\u2717 FAIL: 0.2x - AES is faster",
+    "note": "Comparison is conceptually flawed - different security properties"
+  },
+  "vs_pbkdf2": {
+    "claim": "More efficient than PBKDF2",
+    "pbkdf2_ops_per_sec": 26.15997075397018,
+    "spr_ops_per_sec": 479356.5122474468,
+    "speedup": 18324.046183220486,
+    "status": "INVALID_COMPARISON",
+    "verdict": "\u2717 INVALID: Comparison conceptually flawed",
+    "note": "PBKDF2 is intentionally slow for security - being faster is NOT better"
+  },
+  "space_complexity": {
+    "claim": "O(log_b N) space complexity",
+    "r_squared": 0.9052133584507686,
+    "is_logarithmic": "False",
+    "status": "REFUTED",
+    "verdict": "\u2717 FAIL: Space complexity not logarithmic",
+    "measurements": [
+      {
+        "value": 10,
+        "length": 1,
+        "theoretical": 0.8304820237218407,
+        "ratio": 1.2041199826559246
+      },
+      {
+        "value": 100,
+        "length": 5,
+        "theoretical": 1.6609640474436813,
+        "ratio": 3.0102999566398116
+      },
+      {
+        "value": 1000,
+        "length": 12,
+        "theoretical": 2.4914460711655217,
+        "ratio": 4.816479930623699
+      },
+      {
+        "value": 10000,
+        "length": 10,
+        "theoretical": 3.3219280948873626,
+        "ratio": 3.0102999566398116
+      },
+      {
+        "value": 100000,
+        "length": 13,
+        "theoretical": 4.152410118609203,
+        "ratio": 3.1307119549054043
+      },
+      {
+        "value": 1000000,
+        "length": 13,
+        "theoretical": 4.9828921423310435,
+        "ratio": 2.6089266290878372
+      },
+      {
+        "value": 10000000,
+        "length": 20,
+        "theoretical": 5.813374166052885,
+        "ratio": 3.440342807588356
+      },
+      {
+        "value": 100000000,
+        "length": 16,
+        "theoretical": 6.643856189774725,
+        "ratio": 2.408239965311849
+      },
+      {
+        "value": 1000000000,
+        "length": 21,
+        "theoretical": 7.474338213496566,
+        "ratio": 2.8096132928638244
+      },
+      {
+        "value": 10000000000,
+        "length": 23,
+        "theoretical": 8.304820237218406,
+        "ratio": 2.7694759601086267
+      },
+      {
+        "value": 100000000000,
+        "length": 33,
+        "theoretical": 9.135302260940247,
+        "ratio": 3.612359947967774
+      },
+      {
+        "value": 1000000000000,
+        "length": 28,
+        "theoretical": 9.965784284662087,
+        "ratio": 2.8096132928638244
+      }
+    ]
+  },
+  "scalability": {
+    "status": "MEASURED",
+    "note": "Performance relatively consistent across value ranges"
+  }
+}

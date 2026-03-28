@@ -18,13 +18,12 @@ This directory contains comprehensive documentation for the Sealed Positional Ro
 ### Security
 - [08: Security Analysis](08-security-analysis.md)
 - [09: Cryptographic Tests](09-cryptographic-tests.md)
-- [10: Attack Resistance](10-attack-resistance.md)
+- [10: Key Structure](10-key-structure.md)
 
 ### Quantum Resistance
 - [11: Quantum Analysis](11-quantum-analysis.md)
-- [12: Quantum Scaling](12-quantum-scaling.md)
-- [13: vs RSA](13-vs-rsa.md)
-- [14: vs ECDSA](14-vs-ecdsa.md)
+- [12: Configuration Scaling](12-quantum-scaling.md)
+- [13: Grover's Algorithm](13-grovers-algorithm.md)
 
 ### Competitive Analysis
 - [14: Competitive Analysis](14-competitive-analysis.md)
