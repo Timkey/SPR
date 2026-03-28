@@ -1,0 +1,21 @@
+title: SPR Documentation
+description: Sealed Positional Roman Cryptographic Algorithm Documentation
+theme: minima
+markdown: kramdown
+highlighter: rouge
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+# Navigation
+navigation:
+  - title: "Home"
+    url: "/"
+  - title: "Executive Summary"
+    url: "/executive-summary.html"
+  - title: "Performance"
+    url: "/performance-benchmarks.html"
+  - title: "Quantum Analysis"
+    url: "/quantum-analysis.html"
+  - title: "GitHub Repository"
+    url: "https://github.com/Timkey/SPR"
