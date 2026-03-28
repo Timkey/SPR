@@ -128,6 +128,27 @@ The Sealed Positional Roman encryption scheme represents a **successful innovati
 
 ---
 
+## Acknowledgments
+
+### Principal Investigator
+- **Wellington Ngari** - Research direction, methodology oversight, and collaborative AI coordination
+- **Quality Assurance** - Validation standards, assessment criteria, and final evaluation
+
+### Conceptualization
+- **Google Gemini** - Original algorithm design and theoretical framework development
+- **Collaborative Innovation** - Conversation-driven cryptographic design methodology
+
+### Implementation & Validation  
+- **GitHub Copilot** - Comprehensive implementation, testing, and empirical validation
+- **Evidence-Based Analysis** - Security assessment and performance benchmarking
+
+### Development Methodology
+This project demonstrates the power of human-directed AI-collaborative cryptographic research, combining strategic oversight with AI innovation and validation.
+
+---
+
 **Assessment Date**: March 28, 2026  
 **Status**: Complete - Full implementation and validation cycle completed  
+**Principal Investigator**: Wellington Ngari  
+**Collaborators**: Gemini (conceptualization) + Copilot (validation)  
 **Next Phase**: Transition from research to targeted deployment and community building

@@ -94,6 +94,24 @@ This repository was recovered from SMB network share deletion using systematic .
 3. **Try the Code:** Run the [test_suite.py](./Experiment/scripts/test_suite.py) or explore C implementations
 4. **View Online:** Visit the [GitHub Pages site](https://timkey.github.io/SPR/) for an interactive experience
 
+## 🧑‍🔬 Authors & Contributors
+
+### Principal Investigator
+- **Wellington Ngari** - Research direction, methodology design, and collaborative AI orchestration
+- **Strategic Oversight** - Project scope, validation criteria, and quality standards
+- **Repository Management** - Recovery operations, documentation synthesis, and final assessment
+
+### Conceptualization
+- **Google Gemini** - Original SPR algorithm design and theoretical framework
+- **Collaborative Development** - Iterative refinement through conversation-driven development
+
+### Implementation & Validation
+- **GitHub Copilot** - Code implementation, testing framework, and empirical validation
+- **Comprehensive Analysis** - Security testing, performance benchmarking, and reality assessment
+
+### Repository Recovery
+- **Systematic Analysis** - Recovery from SMB deletion artifacts and comprehensive validation
+
 ## 🤝 Contributing
 
 This repository contains research and analysis of the SPR cryptographic scheme. All implementations and analysis are available for academic and research purposes.
