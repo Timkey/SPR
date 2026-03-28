@@ -1,500 +1,538 @@
+#!/usr/bin/env python3
 """
-Security Analysis for FULL SPR Implementation
-Tests all 7 cryptographic features against the claims made in the conversation.
-
-Author: Wellington Ngari
-Date: 28 March 2026
+SPR Security Analysis Test Suite
+Tests claims about security properties with empirical evidence
 """
 
 import sys
-import os
-sys.path.insert(0, os.path.dirname(__file__))
-
-from spr_full import SPR_Full
-import random
-import math
-from collections import Counter
-from scipy import stats
-import numpy as np
 import json
+import math
+import statistics
+from collections import Counter, defaultdict
+from typing import List, Dict, Tuple
+import numpy as np
 
-class SecurityAnalysisFull:
-    """Comprehensive security analysis for full SPR implementation."""
+# Import SPR test suite to use existing implementation
+sys.path.append('/workspace/Experiment/scripts')
+from test_suite import SPR_Engine
+
+
+class SPRSecurityAnalyzer:
+    """Comprehensive security analysis of SPR"""
     
-    def __init__(self, sample_size=10000):
-        self.sample_size = sample_size
+    def __init__(self):
         self.results = {}
+        self.spr_base16 = SPR_Engine(radix=16)
+        self.spr_base64 = SPR_Engine(radix=64)
     
-    def test_1_frequency_analysis(self):
-        """
-        Test if character distribution is uniform (unpredictable).
+    def run_all_tests(self):
+        """Execute all security tests"""
+        print("=" * 80)
+        print("SPR SECURITY ANALYSIS - Evidence-Based Testing")
+        print("=" * 80)
         
-        CLAIM: With all features + extended alphabet, SPR should have high confusion making
-        frequency analysis ineffective.
-        """
-        print("\n" + "="*80)
-        print("TEST 1: FREQUENCY ANALYSIS - Character Distribution")
-        print("="*80)
+        # Test 1: Frequency Analysis
+        print("\n[TEST 1] Frequency Analysis - Does SPR prevent pattern matching?")
+        self.test_frequency_analysis()
         
-        # Test with FULL features enabled (standard Roman for better compatibility)
-        # NOW WITH POSITION-DEPENDENT ROTATION for 87% better frequency!
-        engine = SPR_Full(
-            radix=31,  # Private radix
-            geometric_progression=[3, 7, 2],  # Custom progression
-            modulus=2**20-1,  # Modular overflow
-            ghosting_primes=True,  # Prime ghosting
-            starting_offset=7,  # Offset key
-            extended_alphabet=False,  # Keep standard for this test
-            rotation_key=[0, 2, 4, 1, 5, 3, 6]  # Position-dependent rotation (87% improvement!)
+        # Test 2: Entropy Measurement
+        print("\n[TEST 2] Entropy Measurement - Is SPR OTP-like?")
+        self.test_entropy_measurement()
+        
+        # Test 3: Pattern Detection
+        print("\n[TEST 3] Pattern Detection - Sequential input patterns")
+        self.test_pattern_detection()
+        
+        # Test 4: Malleability
+        print("\n[TEST 4] Malleability - Can ciphertext be modified?")
+        self.test_malleability()
+        
+        # Test 5: Known-Plaintext Attack Simulation
+        print("\n[TEST 5] Known-Plaintext Attack - Key recovery")
+        self.test_known_plaintext()
+        
+        # Test 6: Collision Testing
+        print("\n[TEST 6] Collision Testing - Duplicate outputs")
+        self.test_collisions()
+        
+        return self.results
+    
+    def test_frequency_analysis(self):
+        """
+        Claim: "Infinite alphabet prevents pattern matching"
+        Test: Encode many values and measure symbol frequency distribution
+        """
+        print("  Testing symbol frequency distribution...")
+        
+        # Encode 10,000 random values
+        sample_size = 10000
+        test_values = np.random.randint(1, 1000000, sample_size)
+        
+        # Count symbols in all encodings
+        symbol_counts = Counter()
+        total_symbols = 0
+        
+        for value in test_values:
+            encoded = self.spr_base16.encode(value)
+            for char in encoded:
+                symbol_counts[char] += 1
+                total_symbols += 1
+        
+        # Calculate expected frequency for uniform distribution
+        num_unique_symbols = len(symbol_counts)
+        expected_freq = total_symbols / num_unique_symbols
+        
+        # Calculate chi-square statistic
+        chi_square = sum(
+            ((count - expected_freq) ** 2) / expected_freq 
+            for count in symbol_counts.values()
         )
         
-        all_chars = []
-        for i in range(self.sample_size):
-            value = random.randint(0, 100000)
-            encoded = engine.encode(value)
-            # Remove delimiters and collect characters
-            chars = encoded.replace("|", "")
-            all_chars.extend(list(chars))
+        # Calculate standard deviation of frequencies
+        frequencies = list(symbol_counts.values())
+        freq_std = statistics.stdev(frequencies)
+        freq_mean = statistics.mean(frequencies)
+        cv = freq_std / freq_mean  # Coefficient of variation
         
-        # Frequency analysis
-        freq = Counter(all_chars)
-        total = len(all_chars)
+        # Analysis
+        print(f"  ✓ Encoded {sample_size:,} values")
+        print(f"  ✓ Total symbols produced: {total_symbols:,}")
+        print(f"  ✓ Unique symbols used: {num_unique_symbols}")
+        print(f"  ✓ Chi-square statistic: {chi_square:.2f}")
+        print(f"  ✓ Frequency std dev: {freq_std:.2f}")
+        print(f"  ✓ Coefficient of variation: {cv:.4f}")
         
-        # Chi-square test for uniformity
-        expected_freq = total / len(freq)
-        chi_square = sum((count - expected_freq)**2 / expected_freq for count in freq.values())
-        df = len(freq) - 1
-        p_value = 1 - stats.chi2.cdf(chi_square, df)
-        
-        print(f"\nTotal characters analyzed: {total}")
-        print(f"Unique symbols: {len(freq)}")
-        print(f"Character frequency distribution:")
-        for char, count in sorted(freq.items(), key=lambda x: x[1], reverse=True)[:10]:
-            print(f"  '{char}': {count} ({100*count/total:.2f}%)")
-        
-        print(f"\nChi-square statistic: {chi_square:.2f}")
-        print(f"P-value: {p_value:.6f}")
-        print(f"Degrees of freedom: {df}")
+        # Show most and least common symbols
+        most_common = symbol_counts.most_common(5)
+        least_common = symbol_counts.most_common()[-5:]
+        print(f"  ✓ Most common: {most_common}")
+        print(f"  ✓ Least common: {least_common}")
         
         # Verdict
-        uniform_threshold = 0.01  # If p > 0.01, distribution is reasonably uniform
-        passed = p_value > uniform_threshold
+        is_uniform = cv < 0.1  # Uniform distribution has low CV
         
-        print(f"\n{'✓ PASS' if passed else '✗ FAIL'}: Character distribution", end="")
-        if passed:
-            print(" is sufficiently random (p > 0.01)")
+        if is_uniform:
+            verdict = "✓ PASS: Distribution is reasonably uniform"
+            claim_status = "SUPPORTED"
         else:
-            print(f" is NOT uniform (p = {p_value:.6f})")
+            verdict = "✗ FAIL: Distribution shows non-uniformity"
+            claim_status = "REFUTED"
+        
+        print(f"\n  {verdict}")
+        print(f"  Claim Status: {claim_status}")
         
         self.results['frequency_analysis'] = {
-            'passed': passed,
+            'claim': 'Infinite alphabet prevents pattern matching',
             'chi_square': chi_square,
-            'p_value': p_value,
-            'unique_symbols': len(freq)
+            'coefficient_of_variation': cv,
+            'is_uniform': is_uniform,
+            'status': claim_status,
+            'verdict': verdict
         }
-        
-        return passed
     
-    def test_2_entropy_analysis(self):
+    def test_entropy_measurement(self):
         """
-        Test if SPR output has high entropy (unpredictability).
-        
-        CLAIM: Full SPR with all features should have near-maximum entropy.
+        Claim: "OTP-like properties" / "High entropy"
+        Test: Calculate Shannon entropy of SPR output
         """
-        print("\n" + "="*80)
-        print("TEST 2: ENTROPY ANALYSIS - Information Content")
-        print("="*80)
+        print("  Measuring Shannon entropy...")
         
-        engine = SPR_Full(
-            radix=31,
-            geometric_progression=[5, 11, 3],
-            modulus=2**24-1,
-            ghosting_primes=True,
-            starting_offset=13
-        )
+        sample_size = 10000
+        test_values = np.random.randint(1, 1000000, sample_size)
         
+        # Collect all symbols
         all_symbols = []
-        for i in range(self.sample_size):
-            value = random.randint(0, 100000)
-            encoded = engine.encode(value)
-            # Split into symbols (including multi-char like "IV")
-            symbols = encoded.split("|")
-            all_symbols.extend(symbols)
+        for value in test_values:
+            encoded = self.spr_base16.encode(value)
+            all_symbols.extend(list(encoded))
         
         # Calculate Shannon entropy
-        freq = Counter(all_symbols)
         total = len(all_symbols)
-        entropy = -sum((count/total) * math.log2(count/total) for count in freq.values())
-        max_entropy = math.log2(len(freq))
-        normalized_entropy = entropy / max_entropy if max_entropy > 0 else 0
+        symbol_counts = Counter(all_symbols)
+        entropy = -sum(
+            (count / total) * math.log2(count / total)
+            for count in symbol_counts.values()
+        )
         
-        print(f"\nTotal symbols: {total}")
-        print(f"Unique symbols: {len(freq)}")
-        print(f"Shannon entropy: {entropy:.4f} bits/symbol")
-        print(f"Maximum possible entropy: {max_entropy:.4f} bits")
-        print(f"Normalized entropy: {normalized_entropy:.4f} (0=predictable, 1=random)")
+        # Calculate theoretical maximum entropy
+        num_symbols = len(symbol_counts)
+        max_entropy = math.log2(num_symbols)
         
-        # Verdict: High-quality encryption should have normalized entropy > 0.9
-        entropy_threshold = 0.8
-        passed = normalized_entropy > entropy_threshold
+        # Entropy as bits per symbol
+        print(f"  ✓ Shannon entropy: {entropy:.4f} bits/symbol")
+        print(f"  ✓ Maximum possible entropy: {max_entropy:.4f} bits/symbol")
+        print(f"  ✓ Entropy ratio: {entropy/max_entropy:.4f} ({entropy/max_entropy*100:.2f}%)")
         
-        print(f"\n{'✓ PASS' if passed else '✗ FAIL'}: Entropy analysis", end="")
-        if passed:
-            print(f" - High unpredictability ({normalized_entropy:.3f} > {entropy_threshold})")
+        # Compare to requirements
+        print(f"\n  Comparison to security standards:")
+        print(f"    - True random (ideal): 8.0 bits/byte")
+        print(f"    - AES output: ~8.0 bits/byte")
+        print(f"    - SPR output: {entropy:.2f} bits/symbol")
+        print(f"    - OTP requirement: Perfect secrecy (key ≥ message)")
+        
+        # Check OTP requirements
+        otp_requirements = {
+            'key_length_gte_message': False,  # SPR uses fixed key
+            'perfect_secrecy': False,  # No formal proof
+            'one_time_use': False,  # Key can be reused
+        }
+        
+        print(f"\n  OTP Requirements Check:")
+        print(f"    ✗ Key length ≥ message length: {otp_requirements['key_length_gte_message']}")
+        print(f"    ✗ Perfect secrecy H(M|C) = H(M): {otp_requirements['perfect_secrecy']}")
+        print(f"    ✗ One-time use only: {otp_requirements['one_time_use']}")
+        
+        is_otp_like = all(otp_requirements.values())
+        meets_high_entropy = entropy / max_entropy > 0.95
+        
+        if is_otp_like:
+            verdict = "✓ PASS: Meets OTP requirements"
+            claim_status = "SUPPORTED"
+        elif meets_high_entropy:
+            verdict = "⚠ PARTIAL: High entropy but not OTP"
+            claim_status = "PARTIALLY_SUPPORTED"
         else:
-            print(f" - Low entropy ({normalized_entropy:.3f} ≤ {entropy_threshold})")
+            verdict = "✗ FAIL: Does not meet OTP requirements"
+            claim_status = "REFUTED"
+        
+        print(f"\n  {verdict}")
+        print(f"  Claim 'OTP-like': {claim_status}")
         
         self.results['entropy_analysis'] = {
-            'passed': passed,
+            'claim': 'OTP-like properties / High entropy',
             'shannon_entropy': entropy,
             'max_entropy': max_entropy,
-            'normalized_entropy': normalized_entropy
+            'entropy_ratio': entropy / max_entropy,
+            'otp_requirements_met': otp_requirements,
+            'is_otp_like': is_otp_like,
+            'has_high_entropy': meets_high_entropy,
+            'status': claim_status,
+            'verdict': verdict
         }
-        
-        return passed
     
-    def test_3_avalanche_effect(self):
+    def test_pattern_detection(self):
         """
-        Test if small input changes cause large output changes (diffusion).
-        
-        CLAIM: With S-Box and modular overflow, SPR should exhibit avalanche effect.
+        Claim: "Prevents pattern matching"
+        Test: Encode sequential values and check for correlations
         """
-        print("\n" + "="*80)
-        print("TEST 3: AVALANCHE EFFECT - Diffusion Quality")
-        print("="*80)
+        print("  Testing pattern correlation...")
         
-        engine = SPR_Full(
-            radix=16,
-            modulus=10000,  # Small modulus to create wraparound effects
-            ghosting_primes=True
-        )
+        # Test sequential inputs
+        sequences = [
+            list(range(1, 101)),  # 1, 2, 3, ..., 100
+            list(range(10, 1010, 10)),  # 10, 20, 30, ..., 1000
+            [2**i for i in range(1, 21)],  # Powers of 2
+        ]
         
-        avalanche_ratios = []
-        sample_count = 1000
+        correlations = []
         
-        for _ in range(sample_count):
-            value1 = random.randint(0, 50000)
-            value2 = value1 + 1  # Change by 1
+        for seq_idx, sequence in enumerate(sequences):
+            encodings = [self.spr_base16.encode(val) for val in sequence]
+            lengths = [len(enc) for enc in encodings]
             
-            enc1 = engine.encode(value1)
-            enc2 = engine.encode(value2)
+            # Check if encoding lengths correlate with input values
+            length_correlation = np.corrcoef(sequence, lengths)[0, 1]
+            correlations.append(abs(length_correlation))
             
-            # Calculate character-level difference
-            len_diff = abs(len(enc1) - len(enc2))
+            print(f"\n  Sequence {seq_idx + 1}: {sequence[:5]}...")
+            print(f"    - Encoding lengths: {lengths[:5]}...")
+            print(f"    - Length correlation: {length_correlation:.4f}")
             
-            # Hamming-like distance
-            max_len = max(len(enc1), len(enc2))
-            min_len = min(len(enc1), len(enc2))
+            # Check character frequency patterns
+            first_chars = [enc[0] if enc else '' for enc in encodings]
+            first_char_variety = len(set(first_chars))
+            print(f"    - First character variety: {first_char_variety}/{len(sequence)}")
             
-            differences = 0
-            for i in range(min_len):
-                if enc1[i] != enc2[i]:
-                    differences += 1
-            differences += len_diff  # Count length differences
-            
-            ratio = differences / max_len if max_len > 0 else 0
-            avalanche_ratios.append(ratio)
+            # Detect if incrementing inputs create incrementing outputs
+            if len(sequence) > 1:
+                increments_preserved = sum(
+                    1 for i in range(len(sequence)-1)
+                    if encodings[i] < encodings[i+1]
+                )
+                increment_ratio = increments_preserved / (len(sequence) - 1)
+                print(f"    - Incremental pattern preserved: {increment_ratio:.2%}")
         
-        avg_avalanche = np.mean(avalanche_ratios)
-        std_avalanche = np.std(avalanche_ratios)
+        avg_correlation = statistics.mean(correlations)
+        max_correlation = max(correlations)
         
-        print(f"\nSamples tested: {sample_count}")
-        print(f"Average character change ratio: {avg_avalanche:.4f}")
-        print(f"Standard deviation: {std_avalanche:.4f}")
-        print(f"Min change ratio: {min(avalanche_ratios):.4f}")
-        print(f"Max change ratio: {max(avalanche_ratios):.4f}")
+        print(f"\n  Average length correlation: {avg_correlation:.4f}")
+        print(f"  Maximum correlation: {max_correlation:.4f}")
         
-        # Good avalanche: changing 1 bit should change ~50% of output
-        # For SPR, we expect at least 30% character change
-        avalanche_threshold = 0.25
-        passed = avg_avalanche > avalanche_threshold
+        # Verdict: Strong correlation (>0.7) means patterns detectable
+        has_patterns = max_correlation > 0.7
         
-        print(f"\n{'✓ PASS' if passed else '✗ FAIL'}: Avalanche effect", end="")
-        if passed:
-            print(f" - Good diffusion ({avg_avalanche:.1%} > {avalanche_threshold:.1%})")
+        if has_patterns:
+            verdict = "✗ FAIL: Patterns are detectable"
+            claim_status = "REFUTED"
         else:
-            print(f" - Poor diffusion ({avg_avalanche:.1%} ≤ {avalanche_threshold:.1%})")
+            verdict = "✓ PASS: Patterns not obviously detectable"
+            claim_status = "SUPPORTED"
         
-        self.results['avalanche_effect'] = {
-            'passed': passed,
-            'average_change_ratio': avg_avalanche,
-            'std_dev': std_avalanche
+        print(f"\n  {verdict}")
+        print(f"  Claim Status: {claim_status}")
+        
+        self.results['pattern_detection'] = {
+            'claim': 'Prevents pattern matching',
+            'avg_correlation': avg_correlation,
+            'max_correlation': max_correlation,
+            'has_detectable_patterns': has_patterns,
+            'status': claim_status,
+            'verdict': verdict
         }
-        
-        return passed
     
-    def test_4_malleability_resistance(self):
+    def test_malleability(self):
         """
-        Test if tampering with ciphertext is detectable.
-        
-        CLAIM: Prime-based positional ghosting + checksum should make tampering cause
-        decryption to fail or produce garbage.
+        Claim: "Tamper evidence via ghosting"
+        Test: Modify ciphertext and check if errors are detected
         """
-        print("\n" + "="*80)
-        print("TEST 4: MALLEABILITY RESISTANCE - Tamper Detection")
-        print("="*80)
+        print("  Testing malleability and tamper detection...")
         
-        engine = SPR_Full(
-            radix=16,
-            ghosting_primes=True,  # This should make tampering detectable
-            starting_offset=11,
-            enable_checksum=True  # Enable checksum for integrity
-        )
+        test_values = [123456, 999999, 500000, 777777, 111111]
+        tamper_results = []
         
-        tamper_detected = 0
-        tamper_tests = 500
-        
-        for _ in range(tamper_tests):
-            original_value = random.randint(100, 10000)
-            encoded = engine.encode(original_value)
+        for value in test_values:
+            original_encoded = self.spr_base16.encode(value)
             
-            # Skip if too short to tamper
-            if len(encoded) < 3:
+            if len(original_encoded) < 2:
                 continue
             
-            # Tamper: change one character
-            tampered = list(encoded)
-            tamper_pos = random.randint(0, len(tampered) - 1)
+            # Tamper by changing a character in the middle
+            mid_idx = len(original_encoded) // 2
+            tampered = list(original_encoded)
             
-            # Change to different character
-            original_char = tampered[tamper_pos]
-            if original_char == 'I':
-                tampered[tamper_pos] = 'V'
-            elif original_char == 'V':
-                tampered[tamper_pos] = 'X'
-            elif original_char == '|':
-                continue  # Skip delimiter changes
-            else:
-                tampered[tamper_pos] = 'I'
-            
+            # Change character
+            original_char = tampered[mid_idx]
+            new_char = 'X' if original_char != 'X' else 'Y'
+            tampered[mid_idx] = new_char
             tampered_str = ''.join(tampered)
             
+            # Try to decode tampered ciphertext
             try:
-                decoded_tampered = engine.decode(tampered_str)
-                # If decode succeeds, check if value changed significantly
-                if decoded_tampered != original_value:
-                    # Tampering detected (value changed)
-                    tamper_detected += 1
-            except:
-                # Decoding failed - tampering detected
-                tamper_detected += 1
+                decoded = self.spr_base16.decode(tampered_str)
+                
+                # Check if silent corruption occurred
+                if decoded != value:
+                    tamper_results.append({
+                        'original': value,
+                        'encoded': original_encoded,
+                        'tampered': tampered_str,
+                        'decoded': decoded,
+                        'detected': False,
+                        'silent_corruption': True
+                    })
+                else:
+                    tamper_results.append({
+                        'original': value,
+                        'detected': False,
+                        'silent_corruption': False
+                    })
+            except Exception as e:
+                # Error was raised - tamper detected
+                tamper_results.append({
+                    'original': value,
+                    'detected': True,
+                    'error': str(e)
+                })
         
-        detection_rate = tamper_detected / tamper_tests
+        detected_count = sum(1 for r in tamper_results if r.get('detected', False))
+        silent_corruption_count = sum(1 for r in tamper_results if r.get('silent_corruption', False))
         
-        print(f"\nTampering tests: {tamper_tests}")
-        print(f"Tamper detected: {tamper_detected}")
-        print(f"Detection rate: {detection_rate:.1%}")
+        print(f"  ✓ Tested {len(test_values)} values")
+        print(f"  ✓ Tampering detected: {detected_count}/{len(tamper_results)}")
+        print(f"  ✓ Silent corruption: {silent_corruption_count}/{len(tamper_results)}")
         
-        # Realistic threshold: 80% detection is actually quite good
-        # Many production systems have lower tamper detection rates
-        threshold = 0.80
-        passed = detection_rate > threshold
+        print(f"\n  Sample results:")
+        for result in tamper_results[:3]:
+            if result.get('silent_corruption'):
+                print(f"    ✗ {result['original']} → {result['encoded']} → TAMPERED → {result['decoded']}")
+                print(f"      SILENT CORRUPTION: Decoded to wrong value!")
         
-        print(f"\n{'✓ PASS' if passed else '✗ FAIL'}: Malleability resistance", end="")
-        if passed:
-            print(f" - High tamper detection ({detection_rate:.1%} > {threshold:.1%})")
+        # Verdict
+        is_malleable = silent_corruption_count > 0
+        has_tamper_evidence = detected_count > silent_corruption_count
+        
+        if is_malleable:
+            verdict = "✗ FAIL: Malleable - no authentication"
+            claim_status = "REFUTED"
+        elif has_tamper_evidence:
+            verdict = "⚠ PARTIAL: Some tamper detection"
+            claim_status = "PARTIALLY_SUPPORTED"
         else:
-            print(f" - Low tamper detection ({detection_rate:.1%} ≤ {threshold:.1%})")
+            verdict = "✓ PASS: Strong tamper evidence"
+            claim_status = "SUPPORTED"
         
-        self.results['malleability_resistance'] = {
-            'passed': passed,
-            'detection_rate': detection_rate
+        print(f"\n  {verdict}")
+        print(f"  Claim Status: {claim_status}")
+        
+        self.results['malleability'] = {
+            'claim': 'Tamper evidence via ghosting',
+            'total_tests': len(tamper_results),
+            'detected': detected_count,
+            'silent_corruption': silent_corruption_count,
+            'is_malleable': is_malleable,
+            'status': claim_status,
+            'verdict': verdict
         }
-        
-        return passed
     
-    def test_5_known_plaintext_resistance(self):
+    def test_known_plaintext(self):
         """
-        Test if knowing plaintext-ciphertext pairs reveals the key.
-        
-        CLAIM: With private radix and custom geometric progression,
-        the system should resist known-plaintext attacks.
+        Claim: "Strong security properties"
+        Test: Given plaintext-ciphertext pairs, attempt key recovery
         """
-        print("\n" + "="*80)
-        print("TEST 5: KNOWN-PLAINTEXT RESISTANCE")
-        print("="*80)
+        print("  Simulating known-plaintext attack...")
         
-        # Victim uses secret configuration
-        secret_radix = 37
-        victim = SPR_Full(
-            radix=secret_radix,
-            geometric_progression=[7, 13],
-            modulus=2**16-1,
-            ghosting_primes=True
-        )
-        
-        # Attacker observes plaintext-ciphertext pairs
-        known_pairs = []
+        # Generate 100 known plaintext-ciphertext pairs
+        pairs = []
         for i in range(100):
-            plaintext = random.randint(0, 10000)
-            ciphertext = victim.encode(plaintext)
-            known_pairs.append((plaintext, ciphertext))
+            value = np.random.randint(1, 1000000)
+            encoded = self.spr_base16.encode(value)
+            pairs.append((value, encoded))
         
-        # Attacker tries to deduce radix by trying different bases
-        possible_radixes = [10, 16, 20, 23, 31, 37, 64]
-        correct_guesses = 0
+        print(f"  ✓ Generated {len(pairs)} known pairs")
         
-        for test_radix in possible_radixes:
-            attacker = SPR_Full(radix=test_radix, ghosting_primes=False)
-            matches = 0
-            
-            for plaintext, ciphertext in known_pairs[:20]:  # Test with subset
-                try:
-                    decoded = attacker.decode(ciphertext)
-                    if decoded == plaintext:
-                        matches += 1
-                except:
-                    pass
-            
-            match_rate = matches / 20
-            if match_rate > 0.8:  # If attacker guesses correctly
-                correct_guesses += 1
-                print(f"  Attacker found working radix: {test_radix} (match rate: {match_rate:.1%})")
+        # Attempt to find patterns
+        # Analysis 1: Check if key can be extracted from encoding patterns
+        length_to_values = defaultdict(list)
+        for value, encoded in pairs:
+            length_to_values[len(encoded)].append(value)
         
-        # Verdict: System resists if attacker can't easily find the radix
-        passed = correct_guesses == 0
+        print(f"  ✓ Encoding length distribution:")
+        for length in sorted(length_to_values.keys()):
+            values = length_to_values[length]
+            print(f"    Length {length}: {len(values)} values (range: {min(values)}-{max(values)})")
         
-        print(f"\nSecret radix: {secret_radix}")
-        print(f"Attacker successful guesses: {correct_guesses}/{len(possible_radixes)}")
+        # Analysis 2: Check if we can predict encoding of new value
+        test_value = 555555
+        actual_encoding = self.spr_base16.encode(test_value)
         
-        print(f"\n{'✓ PASS' if passed else '✗ FAIL'}: Known-plaintext resistance", end="")
-        if passed:
-            print(" - Secret radix remains hidden")
+        # Simple prediction: Use similar values from known pairs
+        similar_pairs = [
+            (v, e) for v, e in pairs 
+            if abs(v - test_value) < 50000
+        ]
+        
+        print(f"\n  Prediction attempt:")
+        print(f"    Target value: {test_value}")
+        print(f"    Actual encoding: {actual_encoding}")
+        print(f"    Similar known values: {len(similar_pairs)}")
+        
+        if similar_pairs:
+            closest = min(similar_pairs, key=lambda x: abs(x[0] - test_value))
+            print(f"    Closest known: {closest[0]} → {closest[1]}")
+            prediction_possible = len(similar_pairs) > 5
         else:
-            print(" - Attacker can deduce configuration")
+            prediction_possible = False
+        
+        # Verdict: If we can narrow down possibilities, attack is viable
+        if prediction_possible:
+            verdict = "⚠ VULNERABLE: Patterns exploitable"
+            claim_status = "REFUTED"
+        else:
+            verdict = "✓ RESISTANT: Prediction difficult"
+            claim_status = "SUPPORTED"
+        
+        print(f"\n  {verdict}")
+        print(f"  Claim Status: {claim_status}")
         
         self.results['known_plaintext'] = {
-            'passed': passed,
-            'attacker_success': correct_guesses > 0
+            'claim': 'Strong security properties',
+            'known_pairs': len(pairs),
+            'prediction_possible': prediction_possible,
+            'status': claim_status,
+            'verdict': verdict
         }
-        
-        return passed
     
-    def test_6_collision_resistance(self):
+    def test_collisions(self):
         """
-        Test if different inputs produce different outputs (no collisions).
-        
-        CLAIM: With modular overflow and private radix, collisions should be rare.
+        Claim: Implicit - unique encodings
+        Test: Check for duplicate encodings of different values
         """
-        print("\n" + "="*80)
-        print("TEST 6: COLLISION RESISTANCE")
-        print("="*80)
+        print("  Testing for collisions...")
         
-        engine = SPR_Full(
-            radix=31,
-            modulus=2**20-1,  # Modular overflow
-            ghosting_primes=True
-        )
+        sample_size = 50000
+        test_values = np.random.randint(1, 10000000, sample_size)
         
         encodings = {}
-        collisions = 0
-        test_count = 50000
+        collisions = []
         
-        for i in range(test_count):
-            value = random.randint(0, 1000000)
-            encoded = engine.encode(value)
+        for value in test_values:
+            encoded = self.spr_base16.encode(value)
             
             if encoded in encodings:
-                # Collision found
-                if encodings[encoded] != value:
-                    collisions += 1
+                collisions.append((value, encodings[encoded], encoded))
             else:
                 encodings[encoded] = value
         
-        collision_rate = collisions / test_count
+        collision_count = len(collisions)
+        unique_encodings = len(encodings)
         
-        print(f"\nValues tested: {test_count}")
-        print(f"Unique encodings: {len(encodings)}")
-        print(f"Collisions found: {collisions}")
-        print(f"Collision rate: {collision_rate:.4%}")
+        print(f"  ✓ Tested {sample_size:,} values")
+        print(f"  ✓ Unique encodings: {unique_encodings:,}")
+        print(f"  ✓ Collisions found: {collision_count}")
         
-        # Good collision resistance: < 0.1% collisions
-        threshold = 0.001
-        passed = collision_rate < threshold
-        
-        print(f"\n{'✓ PASS' if passed else '✗ FAIL'}: Collision resistance", end="")
-        if passed:
-            print(f" - Low collision rate ({collision_rate:.3%} < {threshold:.1%})")
+        if collision_count > 0:
+            print(f"\n  Collision examples:")
+            for val1, val2, enc in collisions[:5]:
+                print(f"    ✗ {val1} and {val2} both encode to: {enc}")
+            verdict = "✗ FAIL: Collisions exist"
+            claim_status = "REFUTED"
         else:
-            print(f" - High collision rate ({collision_rate:.3%} ≥ {threshold:.1%})")
+            verdict = "✓ PASS: No collisions in sample"
+            claim_status = "SUPPORTED"
         
-        self.results['collision_resistance'] = {
-            'passed': passed,
-            'collision_rate': collision_rate,
-            'collisions': collisions
+        print(f"\n  {verdict}")
+        
+        self.results['collisions'] = {
+            'claim': 'Unique encodings (no collisions)',
+            'sample_size': sample_size,
+            'unique_encodings': unique_encodings,
+            'collisions': collision_count,
+            'has_collisions': collision_count > 0,
+            'status': claim_status,
+            'verdict': verdict
         }
-        
-        return passed
+
+
+def main():
+    analyzer = SPRSecurityAnalyzer()
+    results = analyzer.run_all_tests()
     
-    def run_all_tests(self):
-        """Run complete security analysis suite."""
-        print("\n" + "="*80)
-        print("FULL SPR SECURITY ANALYSIS - ALL CRYPTOGRAPHIC FEATURES ENABLED")
-        print("="*80)
-        print("Testing implementation with:")
-        print("  • Variable geometric progression")
-        print("  • Character reallocation")
-        print("  • Modular overflow")
-        print("  • S-Box substitution")
-        print("  • Prime-based positional ghosting")
-        print("  • Starting point offset")
-        print("  • Private radix as secret key")
-        print("="*80)
+    # Generate summary
+    print("\n" + "=" * 80)
+    print("SUMMARY OF SECURITY ANALYSIS")
+    print("=" * 80)
+    
+    status_counts = {
+        'SUPPORTED': 0,
+        'PARTIALLY_SUPPORTED': 0,
+        'REFUTED': 0,
+    }
+    
+    for test_name, test_result in results.items():
+        status = test_result.get('status', 'UNKNOWN')
+        status_counts[status] = status_counts.get(status, 0) + 1
         
-        results = []
-        results.append(self.test_1_frequency_analysis())
-        results.append(self.test_2_entropy_analysis())
-        results.append(self.test_3_avalanche_effect())
-        results.append(self.test_4_malleability_resistance())
-        results.append(self.test_5_known_plaintext_resistance())
-        results.append(self.test_6_collision_resistance())
-        
-        # Final summary
-        passed_count = sum(results)
-        total_count = len(results)
-        pass_rate = passed_count / total_count
-        
-        print("\n" + "="*80)
-        print("SECURITY ANALYSIS SUMMARY")
-        print("="*80)
-        print(f"\nTests passed: {passed_count}/{total_count} ({pass_rate:.1%})")
-        print(f"\nIndividual test results:")
-        for test_name, result in self.results.items():
-            status = "✓ PASS" if result['passed'] else "✗ FAIL"
-            print(f"  {status}: {test_name.replace('_', ' ').title()}")
-        
-        # Overall verdict
-        print(f"\n{'='*80}")
-        if pass_rate >= 0.80:
-            print("VERDICT: STRONG - Full SPR shows good cryptographic properties")
-        elif pass_rate >= 0.50:
-            print("VERDICT: MODERATE - Full SPR shows some cryptographic strength")
-        else:
-            print("VERDICT: WEAK - Full SPR still lacks sufficient cryptographic strength")
-        print(f"{'='*80}\n")
-        
-        # Save results (convert numpy types to native Python)
-        results_serializable = {}
-        for key, val in self.results.items():
-            results_serializable[key] = {}
-            for k, v in val.items():
-                if isinstance(v, (np.bool_, np.generic)):
-                    results_serializable[key][k] = v.item()
-                else:
-                    results_serializable[key][k] = v
-        
-        output_path = '/workspace/Analysis/security_full_results.json'
-        try:
-            with open(output_path, 'w') as f:
-                json.dump(results_serializable, f, indent=2)
-            print(f"\nResults saved to: {output_path}")
-        except Exception as e:
-            print(f"\nNote: Could not save results file: {e}")
-        
-        return pass_rate
+        print(f"\n{test_name.upper()}:")
+        print(f"  Claim: {test_result['claim']}")
+        print(f"  Status: {status}")
+        print(f"  {test_result['verdict']}")
+    
+    total_tests = len(results)
+    print(f"\n" + "=" * 80)
+    print(f"OVERALL ASSESSMENT:")
+    print(f"  Total tests: {total_tests}")
+    print(f"  ✓ Supported: {status_counts.get('SUPPORTED', 0)} ({status_counts.get('SUPPORTED', 0)/total_tests*100:.1f}%)")
+    print(f"  ⚠ Partial: {status_counts.get('PARTIALLY_SUPPORTED', 0)} ({status_counts.get('PARTIALLY_SUPPORTED', 0)/total_tests*100:.1f}%)")
+    print(f"  ✗ Refuted: {status_counts.get('REFUTED', 0)} ({status_counts.get('REFUTED', 0)/total_tests*100:.1f}%)")
+    
+    # Save results
+    output_file = '/workspace/Analysis/security_analysis_results.json'
+    with open(output_file, 'w') as f:
+        json.dump(results, f, indent=2, default=str)
+    print(f"\n✓ Results saved to: {output_file}")
+    
+    return results
 
 
-if __name__ == "__main__":
-    analyzer = SecurityAnalysisFull(sample_size=10000)
-    pass_rate = analyzer.run_all_tests()
-    sys.exit(0 if pass_rate >= 0.80 else 1)
+if __name__ == '__main__':
+    main()

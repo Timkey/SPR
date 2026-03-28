@@ -1,0 +1,89 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy all recovered files
+COPY ../scripts/ ./scripts/
+COPY ../../Analysis/ ./Analysis/
+COPY ../../docs/ ./docs/
+
+# Install any missing packages that might be needed
+RUN pip install --no-cache-dir numpy
+
+# Test script
+RUN echo '#!/usr/bin/env python3\n\
+import sys\n\
+sys.path.append("./scripts")\n\
+\n\
+def test_core_functionality():\n\
+    print("=== TESTING SPR CORE FUNCTIONALITY ===")\n\
+    try:\n\
+        from spr_full import SPR_Full\n\
+        print("✅ SPR_Full import successful")\n\
+        \n\
+        # Basic functionality test\n\
+        spr = SPR_Full()\n\
+        test_value = 1234\n\
+        encoded = spr.encode(test_value)\n\
+        decoded = spr.decode(encoded)\n\
+        print(f"✅ Basic test: {test_value} -> {encoded} -> {decoded}")\n\
+        assert decoded == test_value, f"Decode failed: expected {test_value}, got {decoded}"\n\
+        \n\
+        # Advanced functionality test\n\
+        spr_advanced = SPR_Full(radix=16, ghosting_primes=True, enable_checksum=True)\n\
+        encoded_adv = spr_advanced.encode(9999)\n\
+        decoded_adv = spr_advanced.decode(encoded_adv)\n\
+        print(f"✅ Advanced test: 9999 -> {encoded_adv} -> {decoded_adv}")\n\
+        assert decoded_adv == 9999\n\
+        \n\
+        print("✅ All core functionality tests PASSED")\n\
+        return True\n\
+    except Exception as e:\n\
+        print(f"❌ Core functionality test FAILED: {e}")\n\
+        import traceback\n\
+        traceback.print_exc()\n\
+        return False\n\
+\n\
+def test_file_integrity():\n\
+    print("\\n=== TESTING FILE INTEGRITY ===")\n\
+    import os\n\
+    \n\
+    # Check for key files\n\
+    key_files = [\n\
+        "scripts/spr_full.py",\n\
+        "scripts/test_suite.py",\n\
+        "scripts/analyze_spr_encryption.py",\n\
+        "Analysis/final_comprehensive_assessment.md",\n\
+        "docs/quantum-analysis.md"\n\
+    ]\n\
+    \n\
+    missing_files = []\n\
+    for file_path in key_files:\n\
+        if os.path.exists(file_path):\n\
+            size = os.path.getsize(file_path)\n\
+            print(f"✅ {file_path} ({size} bytes)")\n\
+        else:\n\
+            print(f"❌ {file_path} - MISSING")\n\
+            missing_files.append(file_path)\n\
+    \n\
+    if missing_files:\n\
+        print(f"❌ {len(missing_files)} critical files are missing")\n\
+        return False\n\
+    else:\n\
+        print("✅ All critical files present")\n\
+        return True\n\
+\n\
+if __name__ == "__main__":\n\
+    integrity_ok = test_file_integrity()\n\
+    functionality_ok = test_core_functionality()\n\
+    \n\
+    if integrity_ok and functionality_ok:\n\
+        print("\\n🎉 ALL TESTS PASSED - Project recovery successful!")\n\
+        exit(0)\n\
+    else:\n\
+        print("\\n❌ TESTS FAILED - Issues detected")\n\
+        exit(1)\n\
+' > test_recovery.py
+
+# Run the tests
+CMD ["python", "test_recovery.py"]
