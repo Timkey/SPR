@@ -1,7 +1,7 @@
 ---
-title: SPR (Sealed Positional Roman) - Cryptographic Algorithm
-description: Comprehensive documentation for the SPR encryption architecture
-theme: minima
+layout: default
+title: "SPR: Sealed Positional Roman Encryption"
+description: "Comprehensive documentation for the SPR cryptographic architecture"
 ---
 
 # SPR: Sealed Positional Roman Encryption
