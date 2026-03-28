@@ -10,21 +10,21 @@ theme: minima
 
 ## 🚀 Quick Start
 
-- **[Executive Summary](executive-summary.md)** - High-level overview
-- **[Abstract](abstract.md)** - Technical summary
-- **[Whitepaper](../whitepaper.html)** - Complete technical documentation
+- **[Executive Summary](docs/executive-summary.md)** - High-level overview
+- **[Abstract](docs/abstract.md)** - Technical summary
+- **[Whitepaper](whitepaper.html)** - Complete technical documentation
 
 ## 📊 Analysis & Performance
 
-- **[Performance Benchmarks](performance-benchmarks.md)** - Speed and efficiency analysis
-- **[Quantum Resistance Analysis](quantum-analysis.md)** - Future-proofing assessment
-- **[Strategic Recommendations](strategic-recommendations.md)** - Implementation guidance
+- **[Performance Benchmarks](docs/performance-benchmarks.md)** - Speed and efficiency analysis
+- **[Quantum Resistance Analysis](docs/quantum-analysis.md)** - Future-proofing assessment
+- **[Strategic Recommendations](docs/strategic-recommendations.md)** - Implementation guidance
 
 ## 📚 Additional Resources
 
-- **[Historical Cases](historical-cases.md)** - Context and precedents
-- **[Complete Analysis Reports](../Analysis/)** - Detailed technical evaluations
-- **[Source Code](../Experiment/scripts/)** - Python and C implementations
+- **[Historical Cases](docs/historical-cases.md)** - Context and precedents
+- **[Complete Analysis Reports](Analysis/)** - Detailed technical evaluations
+- **[Source Code](Experiment/scripts/)** - Python and C implementations
 
 ## 🔬 Implementation
 
@@ -46,9 +46,9 @@ The SPR algorithm features:
 
 ## 🛠️ Getting Started
 
-1. **View the [whitepaper](../whitepaper.html)** for complete technical details
-2. **Run the implementations** from the [Experiment/scripts/](../Experiment/scripts/) directory
-3. **Read the analysis** in the [Analysis/](../Analysis/) directory
+1. **View the [whitepaper](whitepaper.html)** for complete technical details
+2. **Run the implementations** from the [Experiment/scripts/](Experiment/scripts/) directory
+3. **Read the analysis** in the [Analysis/](Analysis/) directory
 
 ---
 
