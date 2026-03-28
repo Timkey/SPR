@@ -18,7 +18,7 @@ This directory contains comprehensive documentation for the Sealed Positional Ro
 ### Security
 - [08: Security Analysis](08-security-analysis.md)
 - [09: Cryptographic Tests](09-cryptographic-tests.md)
-- [10: Key Structure](10-key-structure.md)
+- [10: Attack Resistance](10-attack-resistance.md)
 
 ### Quantum Resistance
 - [11: Quantum Analysis](11-quantum-analysis.md)
@@ -26,7 +26,7 @@ This directory contains comprehensive documentation for the Sealed Positional Ro
 - [13: Grover's Algorithm](13-grovers-algorithm.md)
 
 ### Competitive Analysis
-- [14: Competitive Analysis](14-competitive-analysis.md)
+- [12: Competitive Analysis](12-competitive-analysis.md)
 - [15: vs AES/ChaCha20](15-vs-aes-chacha20.md)
 - [16: Market Positioning](16-market-positioning.md)
 
@@ -43,8 +43,8 @@ This directory contains comprehensive documentation for the Sealed Positional Ro
 
 ## Navigation
 
-- **[View White Paper](../whitepaper.html)** - Visual presentation
-- **[GitHub Repository](https://github.com/YOUR_USERNAME/SPR)** - Source code
+- **[GitHub Pages Site](https://timkey.github.io/SPR/)** - Interactive white paper
+- **[GitHub Repository](https://github.com/Timkey/SPR)** - Complete source code and analysis
 - **[Executive Summary](executive-summary.md)** - Quick overview
 
 ## Document Status
