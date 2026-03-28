@@ -1,0 +1,58 @@
+{
+  "frequency_analysis": {
+    "claim": "Infinite alphabet prevents pattern matching",
+    "chi_square": 75581.91367963878,
+    "coefficient_of_variation": 0.7908881792632132,
+    "is_uniform": false,
+    "status": "REFUTED",
+    "verdict": "\u2717 FAIL: Distribution shows non-uniformity"
+  },
+  "entropy_analysis": {
+    "claim": "OTP-like properties / High entropy",
+    "shannon_entropy": 1.9247130918499213,
+    "max_entropy": 2.321928094887362,
+    "entropy_ratio": 0.8289288096767226,
+    "otp_requirements_met": {
+      "key_length_gte_message": false,
+      "perfect_secrecy": false,
+      "one_time_use": false
+    },
+    "is_otp_like": false,
+    "has_high_entropy": false,
+    "status": "REFUTED",
+    "verdict": "\u2717 FAIL: Does not meet OTP requirements"
+  },
+  "pattern_detection": {
+    "claim": "Prevents pattern matching",
+    "avg_correlation": 0.6008575754425757,
+    "max_correlation": 0.7811748217538913,
+    "has_detectable_patterns": "True",
+    "status": "REFUTED",
+    "verdict": "\u2717 FAIL: Patterns are detectable"
+  },
+  "malleability": {
+    "claim": "Tamper evidence via ghosting",
+    "total_tests": 5,
+    "detected": 0,
+    "silent_corruption": 5,
+    "is_malleable": true,
+    "status": "REFUTED",
+    "verdict": "\u2717 FAIL: Malleable - no authentication"
+  },
+  "known_plaintext": {
+    "claim": "Strong security properties",
+    "known_pairs": 100,
+    "prediction_possible": true,
+    "status": "REFUTED",
+    "verdict": "\u26a0 VULNERABLE: Patterns exploitable"
+  },
+  "collisions": {
+    "claim": "Unique encodings (no collisions)",
+    "sample_size": 50000,
+    "unique_encodings": 49881,
+    "collisions": 119,
+    "has_collisions": true,
+    "status": "REFUTED",
+    "verdict": "\u2717 FAIL: Collisions exist"
+  }
+}

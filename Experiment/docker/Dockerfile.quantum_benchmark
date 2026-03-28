@@ -1,0 +1,10 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy optimized SPR implementation
+COPY scripts/spr_full.py scripts/
+COPY scripts/benchmark_quantum_safe.py scripts/
+
+# Run quantum-safe benchmark
+CMD ["python", "scripts/benchmark_quantum_safe.py"]

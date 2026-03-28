@@ -1,0 +1,7 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY scripts/evaluate_quantum_scaling.py .
+
+CMD ["python", "evaluate_quantum_scaling.py"]
