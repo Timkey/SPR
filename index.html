@@ -11,6 +11,10 @@
             box-sizing: border-box;
         }
         
+        html {
+            scroll-behavior: smooth;
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
@@ -23,6 +27,8 @@
             margin: 0 auto;
             background: white;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            width: 100%;
+            min-width: 320px;
         }
         
         header {
@@ -81,6 +87,20 @@
             z-index: 100;
         }
         
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: white;
+            padding: 1rem;
+            cursor: pointer;
+        }
+        
+        .nav-toggle:focus {
+            outline: 2px solid #667eea;
+        }
+        
         nav ul {
             list-style: none;
             display: flex;
@@ -98,19 +118,31 @@
             text-decoration: none;
             padding: 1rem;
             text-align: center;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            min-height: 44px; /* Touch-friendly minimum size */
         }
         
-        nav a:hover {
+        nav a:hover, nav a:focus {
             background: #34495e;
+            border-bottom-color: #667eea;
+        }
+        
+        nav a:active {
+            transform: scale(0.95);
         }
         
         main {
             padding: 2rem;
+            word-wrap: break-word;
+            width: 100%;
+            max-width: 100%;
         }
         
         section {
             margin-bottom: 3rem;
+            overflow-wrap: break-word;
+            scroll-margin-top: 100px; /* Offset for sticky navigation */
         }
         
         h2 {
@@ -119,18 +151,35 @@
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
             border-bottom: 3px solid #667eea;
+            word-wrap: break-word;
         }
         
         h3 {
             color: #764ba2;
             font-size: 1.5rem;
             margin: 1.5rem 0 1rem 0;
+            word-wrap: break-word;
         }
         
         h4 {
             color: #555;
             font-size: 1.2rem;
             margin: 1rem 0 0.5rem 0;
+            word-wrap: break-word;
+        }
+        
+        p {
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+        
+        ul, ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
         }
         
         .rating {
@@ -191,6 +240,17 @@
             border-collapse: collapse;
             margin: 1.5rem 0;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow-x: auto;
+            display: block;
+            white-space: nowrap;
+        }
+        
+        .comparison-table thead,
+        .comparison-table tbody,
+        .comparison-table tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
         }
         
         .comparison-table th {
@@ -198,11 +258,15 @@
             color: white;
             padding: 1rem;
             text-align: left;
+            word-wrap: break-word;
+            hyphens: auto;
         }
         
         .comparison-table td {
             padding: 1rem;
             border-bottom: 1px solid #e9ecef;
+            word-wrap: break-word;
+            hyphens: auto;
         }
         
         .comparison-table tr:hover {
@@ -338,27 +402,166 @@
         }
         
         @media (max-width: 768px) {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                margin: 0;
+                box-shadow: none;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            header {
+                padding: 2rem 1rem;
+            }
+            
             header h1 {
                 font-size: 1.8rem;
+                line-height: 1.2;
+            }
+            
+            header p {
+                font-size: 1rem;
+            }
+            
+            .meta {
+                padding: 1rem;
+            }
+            
+            .meta-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                margin: 0;
+                box-shadow: none;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .nav-toggle {
+                display: block;
             }
             
             nav ul {
+                display: none;
                 flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #2c3e50;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
+            
+            nav ul.show {
+                display: flex;
             }
             
             nav li {
                 min-width: 100%;
+                border-bottom: 1px solid #34495e;
+            }
+            
+            nav li:last-child {
+                border-bottom: none;
+            }
+            
+            nav a {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            main {
+                padding: 1rem !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            
+            .content {
+                padding: 1rem !important;
+            }
+            
+            .section {
+                padding: 1.5rem 0 !important;
+                margin: 0 !important;
+            }
+            
+            .section h2 {
+                font-size: 1.5rem !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .section h3 {
+                font-size: 1.2rem !important;
+                margin: 1rem 0 0.5rem 0 !important;
             }
             
             .pros-cons {
                 grid-template-columns: 1fr;
+                gap: 1rem;
             }
             
             .performance-grid {
                 grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .github-link {
+                display: inline-block;
+                margin: 0.5rem 0;
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            pre {
+                font-size: 0.8rem;
+                padding: 1rem;
+                overflow-x: auto;
+            }
+            
+            .comparison-table {
+                font-size: 0.8rem;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                width: 100%;
+            }
+            
+            .author-note {
+                padding: 1rem !important;
+                margin: 1rem 0 !important;
+                font-size: 0.9rem;
             }
         }
     </style>
+    <script>
+        function toggleNav() {
+            const navUl = document.querySelector('nav ul');
+            navUl.classList.toggle('show');
+        }
+        
+        // Close nav when clicking on a link
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('nav a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    const navUl = document.querySelector('nav ul');
+                    navUl.classList.remove('show');
+                });
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="container">
@@ -393,6 +596,7 @@
         </div>
         
         <nav>
+            <button class="nav-toggle" onclick="toggleNav()" aria-label="Toggle navigation">☰</button>
             <ul>
                 <li><a href="#abstract">Abstract</a></li>
                 <li><a href="#introduction">Introduction</a></li>
