@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  analysis:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /Volumes/mnt/LAB/SPR:/workspace
+    working_dir: /workspace
+    command: tail -f /dev/null
+    container_name: spr_analysis
